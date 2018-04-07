@@ -50,7 +50,8 @@ public class TransformationSequence {
 		for (int i = 0; i <= inLength; i++)
 			for (int j = i + 2; j <= inLength; j++) {
 				arr1 = getTranSeq(new String(in.substring(0, i)), target.substring(0, i), start);
-				arr2 = getNoFlipSeq(new String(in.substring(i, j)), target.substring(i, j), start + i);
+				arr2 = getNoFlipSeq(reverse(in.substring(i, j)), target.substring(i, j), start + i);
+				// arr2 = getTranSeq(reverse(in.substring(i, j)), target.substring(i, j), start + i);
 				arr3 = getTranSeq(new String(in.substring(j, inLength)), target.substring(j, inLength), start + j);
 				arr1.addAll(arr2); // consider re-implement with self-made linked list
 				arr1.addAll(arr3);
@@ -96,12 +97,11 @@ public class TransformationSequence {
 		
 		ArrayList<String> seq = new ArrayList<String>();
 		int inLength = in.length();
-		int reversedIndex;
+		// int reversedIndex;
 		// check in reverse order due to the flip
 		for (int i = 0; i < inLength; i++) {
-			reversedIndex = inLength - 1 - i;
-			if (in.charAt(i) != target.charAt(reversedIndex))
-				seq.add("substitute letter \"" + in.charAt(i) + "\" at index " + (reversedIndex + start) + " with \"" + target.charAt(reversedIndex) + "\"");
+			if (in.charAt(i) != target.charAt(i))
+				seq.add("substitute letter \"" + in.charAt(i) + "\" at index " + (i + start) + " with \"" + target.charAt(i) + "\"");
 		}
 		mem.put(key, seq);
 		return seq;
