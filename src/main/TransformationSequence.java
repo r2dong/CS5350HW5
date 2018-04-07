@@ -48,7 +48,7 @@ public class TransformationSequence {
 		ArrayList<String> arr2;
 		ArrayList<String> arr3;
 		for (int i = 0; i <= inLength; i++)
-			for (int j = i + 2; j <= inLength; j++) {
+			for (int j = i + 2; j <= inLength; j++) {				
 				arr1 = getTranSeq(new String(in.substring(0, i)), target.substring(0, i), start);
 				arr2 = getNoFlipSeq(new String(in.substring(i, j)), target.substring(i, j), start + i);
 				arr3 = getTranSeq(new String(in.substring(j, inLength)), target.substring(j, inLength), start + j);
@@ -124,14 +124,19 @@ public class TransformationSequence {
 		TransformationSequence t = new TransformationSequence();
 		String source;
 		String target;
-		source = "timeflieslikeanarrow";
-		target = "tfemiliilzejeworrbna";
+		//source = "timefliezlijeanbrrow";
+		//target = "timeflieslikeanarrow";
+		source = "zlijb";
+		target = "slika";
 		//source = "abc";
 		//target = "def";
 		// source = "ab";
 		// target = "de";
 		//source = "abcf";
 		//target = "baec";
+		//source = "abcdy";
+		//target = "xbzdf";
+		
 		
 		t.reverselyPrintArray(t.getTranSeqWrapper(source, target, 0));
 	}
