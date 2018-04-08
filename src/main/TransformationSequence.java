@@ -8,7 +8,7 @@ public class TransformationSequence {
 	HashMap<Triple, ArrayList<String>> mem;
 	
 	// handles initializations for the algorithm
-	public ArrayList<String> getTranSeqWrapper(String in, final String target, int start) {
+	public ArrayList<String> getTranSeqWrapper(final String in, final String target, int start) {
 		mem = new HashMap<>();
 		return getTranSeq(in, target, start);
 	}
@@ -42,6 +42,9 @@ public class TransformationSequence {
 			}
 		}
 		
+		
+		ArrayList<String> sumArr;
+		
 		// recursive case 1
 		ArrayList<String> curMinFlipArr = null;
 		ArrayList<String> arr1;
@@ -52,13 +55,15 @@ public class TransformationSequence {
 				arr1 = getTranSeq(new String(in.substring(0, i)), target.substring(0, i), start);
 				arr2 = getNoFlipSeq(new String(in.substring(i, j)), target.substring(i, j), start + i);
 				arr3 = getTranSeq(new String(in.substring(j, inLength)), target.substring(j, inLength), start + j);
-				arr1.addAll(arr2); // consider re-implement with self-made linked list
-				arr1.addAll(arr3);
-				arr1.add("flip(" + (i + start) + ", " + (j + start - 1) + ")");
+				sumArr = new ArrayList<>();
+				sumArr.addAll(arr1);
+				sumArr.addAll(arr2);
+				sumArr.addAll(arr3);
+				sumArr.add("flip(" + (i + start) + ", " + (j + start - 1) + ")");
 				if (curMinFlipArr == null)
-					curMinFlipArr = arr1;
+					curMinFlipArr = sumArr;
 				else
-					curMinFlipArr = arr1.size() < curMinFlipArr.size() ? arr1 : curMinFlipArr;
+					curMinFlipArr = sumArr.size() < curMinFlipArr.size() ? sumArr : curMinFlipArr;
 			}
 		// recursive case 2
 		ArrayList<String> curMinSubArr = null;
@@ -68,12 +73,14 @@ public class TransformationSequence {
 			if (in.charAt(i) != target.charAt(i)) { 
 				arr5 = getTranSeq(new String(in.substring(0, i)), target.substring(0, i), start);
 				arr6 = getTranSeq(new String(in.substring(i + 1, inLength)), target.substring(i + 1, inLength), start + i + 1);
-				arr5.addAll(arr6);
-				arr5.add("substitute letter \"" + in.charAt(i) + "\" at index " + (i + start) + " with \"" + target.charAt(i) + "\"");
+				sumArr = new ArrayList<>();
+				sumArr.addAll(arr5);
+				sumArr.addAll(arr6);
+				sumArr.add("substitute letter \"" + in.charAt(i) + "\" at index " + (i + start) + " with \"" + target.charAt(i) + "\"");
 				if (curMinSubArr == null)
-					curMinSubArr = arr5;
+					curMinSubArr = sumArr;
 				else
-					curMinSubArr = arr5.size() < curMinSubArr.size() ? arr5 : curMinSubArr;
+					curMinSubArr = sumArr.size() < curMinSubArr.size() ? sumArr : curMinSubArr;
 			}
 		}
 		// handle edge case: curMinSubArr not initialized due to already correct array
@@ -126,8 +133,8 @@ public class TransformationSequence {
 		String target;
 		//source = "timefliezlijeanbrrow";
 		//target = "timeflieslikeanarrow";
-		source = "lijb";
-		target = "lika";
+		//source = "lijb";
+		//target = "lika";
 		//source = "abc";
 		//target = "def";
 		// source = "ab";
@@ -136,7 +143,12 @@ public class TransformationSequence {
 		//target = "baec";
 		//source = "abcdy";
 		//target = "xbzdf";
-		
+		//source = "lijfdsafdsafsd";
+		//target = "lijfdsafdsafsd";
+		//source = "li";
+		//target = "li";
+		source = "timeflieslikeanarrow";
+		target = "tfemiliilzejeworrbna";
 		
 		t.reverselyPrintArray(t.getTranSeqWrapper(source, target, 0));
 	}
