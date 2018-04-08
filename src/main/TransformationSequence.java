@@ -1,20 +1,20 @@
 package main;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class TransformationSequence {
 	
-	HashMap<Triple, ArrayList<String>> mem;
+	HashMap<Triple, MyLinkedList> mem;
 	
 	// handles initializations for the algorithm
-	public ArrayList<String> getTranSeqWrapper(String in, String t) {
+	public MyLinkedList getTranSeqWrapper(String in, String t) {
 		mem = new HashMap<>();
 		return getSeq(in, t, 0);
 	}
 	
 	// the actual algorithm
-	private ArrayList<String> getSeq(String in, String t, int start) {
+	private MyLinkedList getSeq(String in, String t, int start) {
 		
 		Triple key = new Triple(in, t, false);
 		
@@ -26,7 +26,7 @@ public class TransformationSequence {
 		
 		// base case 1
 		if (inLength == 0)
-			return new ArrayList<String>();
+			return new MyLinkedList();
 		
 		// base case 2
 		/* not using memorization matrix here, both constant time, not sure
@@ -35,65 +35,65 @@ public class TransformationSequence {
 		 */
 		if (inLength == 1) {
 			if (in.charAt(0) == t.charAt(0))
-				return new ArrayList<String>();
+				return new MyLinkedList();
 			else {
-				ArrayList<String> answer = new ArrayList<>();
+				MyLinkedList answer = new MyLinkedList();
 				answer.add(makeSubStr(in.charAt(0), start, t.charAt(0)));
 				return answer;
 			}
 		}
 		
 		
-		ArrayList<String> sumArr;
+		MyLinkedList sumArr;
 		
 		// recursive case 1, try all possible ways of splitting
-		ArrayList<String> curMinFlipArr = null;
-		ArrayList<String> a1;
-		ArrayList<String> a2;
-		ArrayList<String> a3;
+		MyLinkedList curMinFlipArr = null;
+		MyLinkedList a1;
+		MyLinkedList a2;
+		MyLinkedList a3;
 		for (int i = 0; i <= inLength; i++)
 			for (int j = i + 2; j <= inLength; j++) {
 				a1 = getSeq(in.substring(0, i), t.substring(0, i), start);
 				a2 = getNFSeq(in.substring(i, j), t.substring(i, j), start + i);
 				a3 = getSeq(in.substring(j, inLength), 
 						t.substring(j, inLength), start + j);
-				sumArr = new ArrayList<>();
-				sumArr.addAll(a1);
-				sumArr.addAll(a2);
-				sumArr.addAll(a3);
+				sumArr = new MyLinkedList();
+				sumArr.concate(a1);
+				sumArr.concate(a2);
+				sumArr.concate(a3);
 				sumArr.add(makeFlipStr(i + start, j + start - 1));
 				if (curMinFlipArr == null)
 					curMinFlipArr = sumArr;
 				else
-					curMinFlipArr = sumArr.size() < curMinFlipArr.size() ? 
+					curMinFlipArr = sumArr.size < curMinFlipArr.size ? 
 							sumArr : curMinFlipArr;
 			}
 		// recursive case 2, try all possible ways of substitution
-		ArrayList<String> curMinSubArr = null;
-		ArrayList<String> arr5;
-		ArrayList<String> arr6;
+		MyLinkedList curMinSubArr = null;
+		MyLinkedList arr5;
+		MyLinkedList arr6;
 		for (int i = 0; i < inLength; i++) {
 			if (in.charAt(i) != t.charAt(i)) { 
 				arr5 = getSeq(in.substring(0, i), t.substring(0, i), start);
 				arr6 = getSeq(in.substring(i + 1, inLength), 
 						t.substring(i + 1, inLength), start + i + 1);
-				sumArr = new ArrayList<>();
-				sumArr.addAll(arr5);
-				sumArr.addAll(arr6);
+				sumArr = new MyLinkedList();
+				sumArr.concate(arr5);
+				sumArr.concate(arr6);
 				sumArr.add(makeSubStr(in.charAt(i), i + start, t.charAt(i)));
 				if (curMinSubArr == null)
 					curMinSubArr = sumArr;
 				else
-					curMinSubArr = sumArr.size() < curMinSubArr.size() ? 
+					curMinSubArr = sumArr.size < curMinSubArr.size ? 
 							sumArr : curMinSubArr;
 			}
 		}
 		// in case curMinSubArr not initialized for already correct array
 		if (curMinSubArr == null)
-			curMinSubArr = new ArrayList<String>();
+			curMinSubArr = new MyLinkedList();
 		
 		// update memorization table, than return
-		ArrayList<String> answer = curMinFlipArr.size() < curMinSubArr.size() ?
+		MyLinkedList answer = curMinFlipArr.size < curMinSubArr.size ?
 				curMinFlipArr : curMinSubArr;
 		mem.put(key, answer);
 		return answer;
@@ -109,7 +109,7 @@ public class TransformationSequence {
 	}
 	
 	// calculate transformation path when a subarray can no loger be flipped
-	private ArrayList<String> getNFSeq(String in, final String t, int start) {
+	private MyLinkedList getNFSeq(String in, final String t, int start) {
 		
 		Triple key = new Triple(in, t, true);
 		
@@ -117,7 +117,7 @@ public class TransformationSequence {
 		if (mem.containsKey(key))
 			return mem.get(key);
 		
-		ArrayList<String> seq = new ArrayList<String>();
+		MyLinkedList seq = new MyLinkedList();
 		int inLength = in.length();
 		int revInd;
 		// check in reverse order due to the flip
@@ -131,17 +131,19 @@ public class TransformationSequence {
 		return seq;
 	}
 	
-	public void reverselyPrintArray(ArrayList<String> arr) {
-		for (int i = arr.size() - 1; i > -1; i--)
-			System.out.println(arr.get(i));
+	public void reverselyPrintArray(MyLinkedList arr) {
+		Iterator<String> iterator = arr.getBackwardIterator();
+		while (iterator.hasNext()) {
+			System.out.println(iterator.next());
+		}
 	}
 	
 	public static void main(String[] args) {
 		TransformationSequence t = new TransformationSequence();
 		String source;
 		String target;
-		source = "timeflieslikeanarrow";
-		target = "tfemiliilzejeworrbna";
+		source = "lieslikeanarrow";
+		target = "liilzejeworrbna";
 		
 		t.reverselyPrintArray(t.getTranSeqWrapper(source, target));
 	}
