@@ -126,8 +126,8 @@ public class TransformationSequence {
 		String target;
 		//source = "timefliezlijeanbrrow";
 		//target = "timeflieslikeanarrow";
-		source = "zlijb";
-		target = "slika";
+		source = "lijb";
+		target = "lika";
 		//source = "abc";
 		//target = "def";
 		// source = "ab";
