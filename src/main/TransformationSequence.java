@@ -143,6 +143,16 @@ public class TransformationSequence {
 		source = "timeflieslikeanarrow";
 		target = "tfemiliilzejeworrbna";
 		
-		t.reverselyPrintArray(t.getTranSeqWrapper(source, target));
+		String longSource = RandomStringGenerator.generate(200);
+		String longTarget = RandomStringGenerator.mutate(longSource);
+		System.err.println(longTarget);
+		System.err.println(longSource);
+		
+		System.err.println("Finished generating random strings.");
+		long startTime = System.nanoTime();
+		ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
+		long endTime = System.nanoTime();
+		System.err.println("total time = " + (endTime - startTime) / 1000000000 + " seconds.");
+		t.reverselyPrintArray(result);
 	}
 }
