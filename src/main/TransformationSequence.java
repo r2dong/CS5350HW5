@@ -126,27 +126,25 @@ public class TransformationSequence {
 	}
 	
 	public static void main(String[] args) {
+		
+		String source = null;
+		String target = null;
 		TransformationSequence t = new TransformationSequence();
-		String source;
-		String target;
-		source = "timeflieslikeanarrow";
-		target = "tfemiliilzejeworrbna";
-		//source = "abcd";
-		//target = "bcba";
-		//source = "ab";
-		//target = "bc";
-		
-		String longSource = RandomStringGenerator.generate(500);
-		String longTarget = RandomStringGenerator.mutate(longSource);
-		System.err.println(longTarget);
-		System.err.println(longSource);
-		
-		System.err.println("Finished generating random strings.");
+			
+		if (!args[0].equals("random")) {
+			source = args[0];
+			target = args[1];
+		}
+		else {
+			int length = Integer.parseInt(args[1]);
+			source = RandomStringGenerator.generate(length);
+			target = RandomStringGenerator.mutate(source);
+		}
 		long startTime = System.nanoTime();
-		//ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
 		ArrayList<String> result = t.getTranSeqWrapper(source, target);
 		long endTime = System.nanoTime();
-		System.err.println("total time = " + (endTime - startTime) / 1000000000 + " seconds.");
+		double totalTime = (endTime - startTime) / 1000000000;
+		System.err.println("total time = " + totalTime + " seconds.\n");
 		t.reverselyPrintArray(result);
 	}
 }
