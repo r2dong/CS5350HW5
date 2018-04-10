@@ -10,18 +10,13 @@ public class TransformationSequence {
 	// handles initializations for the algorithm
 	public ArrayList<String> getTranSeqWrapper(String in, String t) {
 		mem = new HashMap<>();
-		return getSeq(in, t, 0);
+		return getSeq(in, t, 0, in.length());
 	}
 	
 	// the actual algorithm
-	private ArrayList<String> getSeq(String in, String t, int start) {
+	private ArrayList<String> getSeq(String in, String t, int start, int end) {
 		
-		
-		
-		Triple key = new Triple(in, t, false);
-		//System.err.println(in);
-		//System.err.println(t);
-		//System.err.println(start);
+		Triple key = new Triple(start, end, false);
 		
 		// return answer if subproblem already solved
 		if (mem.containsKey(key))
@@ -30,7 +25,7 @@ public class TransformationSequence {
 		int inLength = in.length();
 		
 		// base case 1
-		if (inLength == 0)
+		if (start == end)
 			return new ArrayList<String>();
 		
 		// base case 2
@@ -38,16 +33,15 @@ public class TransformationSequence {
 		 * which has a larger overhead. In either case should not be a big
 		 * deal
 		 */
-		if (inLength == 1) {
-			if (in.charAt(0) == t.charAt(0))
+		if (start == end - 1) {
+			if (in.charAt(start) == t.charAt(start))
 				return new ArrayList<String>();
 			else {
 				ArrayList<String> answer = new ArrayList<>();
-				answer.add(makeSubStr(in.charAt(0), start, t.charAt(0)));
+				answer.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
 				return answer;
 			}
 		}
-		
 		
 		ArrayList<String> sumArr;
 		
@@ -55,14 +49,13 @@ public class TransformationSequence {
 		ArrayList<String> curMinFlipArr = null;
 		ArrayList<String> a2;
 		ArrayList<String> a3;
-		for (int i = 2; i <= inLength; i++) {
-				a2 = getNFSeq(in.substring(0, i), t.substring(0, i), start);
-				a3 = getSeq(in.substring(i, inLength), 
-						t.substring(i, inLength), start + i);
+		for (int i = start + 2; i <= inLength; i++) {
+				a2 = getNFSeq(in, t, start, i);
+				a3 = getSeq(in, t, i, inLength);
 				sumArr = new ArrayList<>();
 				sumArr.addAll(a2);
 				sumArr.addAll(a3);
-				sumArr.add(makeFlipStr(start, i + start - 1));
+				sumArr.add(makeFlipStr(start, i - 1));
 				if (curMinFlipArr == null)
 					curMinFlipArr = sumArr;
 				else
@@ -72,17 +65,13 @@ public class TransformationSequence {
 		// recursive case 2, first letter does not belong to flip
 		ArrayList<String> curMinSubArr = null;
 		ArrayList<String> arr6;
-		arr6 = getSeq(in.substring(1, inLength), 
-				t.substring(1, inLength), start + 1);
+		arr6 = getSeq(in, t, start + 1, inLength);
 		sumArr = new ArrayList<>();
-		if (in.charAt(0) != t.charAt(0)) {
-			sumArr.add(makeSubStr(in.charAt(0), 0 + start, t.charAt(0)));
+		if (in.charAt(start) != t.charAt(start)) {
+			sumArr.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
 		}
 		sumArr.addAll(arr6);
 		curMinSubArr = sumArr;
-		// in case curMinSubArr not initialized for already correct array
-		if (curMinSubArr == null)
-			curMinSubArr = new ArrayList<String>();
 		
 		// update memorization table, than return
 		ArrayList<String> answer = curMinFlipArr.size() < curMinSubArr.size() ?
@@ -100,9 +89,9 @@ public class TransformationSequence {
 	}
 	
 	// calculate transformation path when a subarray can no loger be flipped
-	private ArrayList<String> getNFSeq(String in, final String t, int start) {
+	private ArrayList<String> getNFSeq(String in, String t, int start, int end) {
 		
-		Triple key = new Triple(in, t, true);
+		Triple key = new Triple(start, end, true);
 		
 		// return answer if sub-problem already solved
 		if (mem.containsKey(key))
@@ -112,10 +101,10 @@ public class TransformationSequence {
 		int inLength = in.length();
 		int revInd;
 		// check in reverse order due to the flip
-		for (int i = 0; i < inLength; i++) {
-			revInd = inLength - 1 - i;
+		for (int i = start; i < end; i++) {
+			revInd = inLength - (i - start) - 1;
 			if (in.charAt(i) != t.charAt(revInd))
-				seq.add(makeSubStr(in.charAt(i), revInd + start, 
+				seq.add(makeSubStr(in.charAt(i), revInd, 
 						t.charAt(revInd)));
 		}
 		mem.put(key, seq);
@@ -133,8 +122,8 @@ public class TransformationSequence {
 		String target;
 		//source = "timeflieslikeanarrow";
 		//target = "tfemiliilzejeworrbna";
-		//source = "ab";
-		//target = "ac";
+		source = "abcd";
+		target = "bcba";
 		
 		String longSource = RandomStringGenerator.generate(500);
 		String longTarget = RandomStringGenerator.mutate(longSource);
@@ -143,7 +132,8 @@ public class TransformationSequence {
 		
 		System.err.println("Finished generating random strings.");
 		long startTime = System.nanoTime();
-		ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
+		//ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
+		ArrayList<String> result = t.getTranSeqWrapper(source, target);
 		long endTime = System.nanoTime();
 		System.err.println("total time = " + (endTime - startTime) / 1000000000 + " seconds.");
 		t.reverselyPrintArray(result);
