@@ -5,10 +5,17 @@ import java.util.HashMap;
 
 public class TransformationSequence {
 	
-	HashMap<Triple, ArrayList<String>> mem;
+	int inLength; // input size
+	HashMap<Triple, ArrayList<String>> mem; // memoization table
+	final ArrayList<String> empty = new ArrayList<>();
 	
-	// handles initializations for the algorithm
+	// initialize algorithm
 	public ArrayList<String> getTranSeqWrapper(String in, String t) {
+		if (in.length() != t.length()) {
+			System.err.println("source and target length does not match");
+			return null;
+		}
+		inLength = in.length();
 		mem = new HashMap<>();
 		return getSeq(in, t, 0, in.length());
 	}
@@ -19,30 +26,21 @@ public class TransformationSequence {
 		Triple key = new Triple(start, end, false);
 		
 		// return answer if subproblem already solved
-		if (mem.containsKey(key)) {/*
-			ArrayList<String> answer = mem.get(key);
-			System.err.println("getting from matrix start: " + start + ", end: " + end + ", flipped: " + key.flipped);
-			reverselyPrintArray(answer);
-			System.err.println("----------------------------");
-			System.err.println();
-			*/
+		if (mem.containsKey(key))
 			return mem.get(key);
-		}
-		
-		int inLength = in.length();
 		
 		// base case 1
 		if (start == end)
 			return new ArrayList<String>();
 		
-		// base case 2
-		/* not using memorization matrix here, both constant time, not sure
+		/* base case 2
+		 * not using memorization matrix here, both constant time, not sure
 		 * which has a larger overhead. In either case should not be a big
 		 * deal
 		 */
 		if (start == end - 1) {
 			if (in.charAt(start) == t.charAt(start))
-				return new ArrayList<String>();
+				return empty;
 			else {
 				ArrayList<String> answer = new ArrayList<>();
 				answer.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
@@ -50,53 +48,49 @@ public class TransformationSequence {
 			}
 		}
 		
+		// helper variables to sum results from recursive calls
 		ArrayList<String> sumArr;
-		
-		/* recursive case 1: try all possible flips including first letter */
-		ArrayList<String> curMinFlipArr = null;
+		ArrayList<String> a1;
 		ArrayList<String> a2;
-		ArrayList<String> a3;
+		
+		//recursive case 1: try all possible flips including first letter
+		ArrayList<String> curMinFlipArr = null;
 		for (int i = start + 2; i <= inLength; i++) {
-				a2 = getNFSeq(in, t, start, i);
-				a3 = getSeq(in, t, i, inLength);
+				a1 = getNFSeq(in, t, start, i);
+				a2 = getSeq(in, t, i, inLength);
 				sumArr = new ArrayList<>();
+				sumArr.addAll(a1);
 				sumArr.addAll(a2);
-				sumArr.addAll(a3);
 				sumArr.add(makeFlipStr(start, i - 1));
 				if (curMinFlipArr == null)
 					curMinFlipArr = sumArr;
-				else
-					curMinFlipArr = sumArr.size() < curMinFlipArr.size() ? 
-							sumArr : curMinFlipArr;
+				else if (sumArr.size() < curMinFlipArr.size())
+					curMinFlipArr = sumArr;
 		}
+		
 		// recursive case 2, first letter does not belong to flip
 		ArrayList<String> curMinSubArr = null;
-		ArrayList<String> arr6;
-		arr6 = getSeq(in, t, start + 1, inLength);
+		a1 = getSeq(in, t, start + 1, inLength);
 		sumArr = new ArrayList<>();
 		if (in.charAt(start) != t.charAt(start)) {
 			sumArr.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
 		}
-		sumArr.addAll(arr6);
+		sumArr.addAll(a1);
 		curMinSubArr = sumArr;
 		
 		// update memorization table, than return
 		ArrayList<String> answer = curMinFlipArr.size() < curMinSubArr.size() ?
 				curMinFlipArr : curMinSubArr;
 		mem.put(key, answer);
-		/*
-		System.err.println("Subproblem start: " + start + ", end: " + end + ", flipped: " + key.flipped);
-		reverselyPrintArray(answer);
-		System.err.println("-----------------------");
-		System.err.println();
-		*/
 		return answer;
 	}
 	
+	// make a string representing flip
 	private String makeFlipStr(int start, int end) {
 		return "flip(" + start + ", " + end + ")";
 	}
 	
+	// make a string representing a substitution
 	private String makeSubStr(char source, int index, char t) {
 		return index + ": " +  source + " -> " + t;
 	}
@@ -107,19 +101,10 @@ public class TransformationSequence {
 		Triple key = new Triple(start, end, true);
 		
 		// return answer if sub-problem already solved
-		if (mem.containsKey(key)) {
-			ArrayList<String> answer = mem.get(key);
-			/*
-			System.err.println("getting from matrix start: " + start + ", end: " + end + ", flipped: " + key.flipped);
-			reverselyPrintArray(answer);
-			System.err.println("----------------------------");
-			System.err.println();
-			*/
+		if (mem.containsKey(key))
 			return mem.get(key);
-		}
 		
 		ArrayList<String> seq = new ArrayList<String>();
-		int inLength = in.length();
 		int revInd;
 		// check in reverse order due to the flip
 		for (int i = start; i < end; i++) {
@@ -129,15 +114,12 @@ public class TransformationSequence {
 						t.charAt(revInd)));
 		}
 		mem.put(key, seq);
-		/*
-		System.err.println("Subproblem start: " + start + ", end: " + end + ", flipped: " + key.flipped);
-		reverselyPrintArray(seq);
-		System.err.println("-----------------------");
-		System.err.println();
-		*/
 		return seq;
 	}
 	
+	/* due to recursion, order of elementary moves are in reverse oder, so we
+	 * print results in reverse to get the correct order
+	 */
 	public void reverselyPrintArray(ArrayList<String> arr) {
 		for (int i = arr.size() - 1; i > -1; i--)
 			System.err.println(arr.get(i));
@@ -162,7 +144,7 @@ public class TransformationSequence {
 		System.err.println("Finished generating random strings.");
 		long startTime = System.nanoTime();
 		//ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
-		ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
+		ArrayList<String> result = t.getTranSeqWrapper(source, target);
 		long endTime = System.nanoTime();
 		System.err.println("total time = " + (endTime - startTime) / 1000000000 + " seconds.");
 		t.reverselyPrintArray(result);
