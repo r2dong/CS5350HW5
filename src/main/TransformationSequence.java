@@ -19,9 +19,9 @@ public class TransformationSequence {
 		
 		
 		Triple key = new Triple(in, t, false);
-		System.err.println(in);
-		System.err.println(t);
-		System.err.println(start);
+		//System.err.println(in);
+		//System.err.println(t);
+		//System.err.println(start);
 		
 		// return answer if subproblem already solved
 		if (mem.containsKey(key))
@@ -96,8 +96,7 @@ public class TransformationSequence {
 	}
 	
 	private String makeSubStr(char source, int index, char t) {
-		return "substitute letter \"" + source + "\" at index " + index + 
-				" with \"" + t + "\"";
+		return index + ": " +  source + " -> " + t;
 	}
 	
 	// calculate transformation path when a subarray can no loger be flipped
@@ -137,7 +136,7 @@ public class TransformationSequence {
 		//source = "ab";
 		//target = "ac";
 		
-		String longSource = RandomStringGenerator.generate(450);
+		String longSource = RandomStringGenerator.generate(500);
 		String longTarget = RandomStringGenerator.mutate(longSource);
 		System.err.println(longTarget);
 		System.err.println(longSource);
@@ -147,6 +146,6 @@ public class TransformationSequence {
 		ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
 		long endTime = System.nanoTime();
 		System.err.println("total time = " + (endTime - startTime) / 1000000000 + " seconds.");
-		//t.reverselyPrintArray(result);
+		t.reverselyPrintArray(result);
 	}
 }
