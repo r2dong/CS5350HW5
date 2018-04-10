@@ -16,7 +16,12 @@ public class TransformationSequence {
 	// the actual algorithm
 	private ArrayList<String> getSeq(String in, String t, int start) {
 		
+		
+		
 		Triple key = new Triple(in, t, false);
+		System.err.println(in);
+		System.err.println(t);
+		System.err.println(start);
 		
 		// return answer if subproblem already solved
 		if (mem.containsKey(key))
@@ -46,48 +51,35 @@ public class TransformationSequence {
 		
 		ArrayList<String> sumArr;
 		
-		// recursive case 1, try all possible ways of splitting
+		/* recursive case 1: try all possible flips including first letter */
 		ArrayList<String> curMinFlipArr = null;
-		ArrayList<String> a1;
 		ArrayList<String> a2;
 		ArrayList<String> a3;
-		for (int i = 0; i <= inLength; i++)
-			for (int j = i + 2; j <= inLength; j++) {
-				a1 = getSeq(in.substring(0, i), t.substring(0, i), start);
-				a2 = getNFSeq(in.substring(i, j), t.substring(i, j), start + i);
-				a3 = getSeq(in.substring(j, inLength), 
-						t.substring(j, inLength), start + j);
+		for (int i = 2; i <= inLength; i++) {
+				a2 = getNFSeq(in.substring(0, i), t.substring(0, i), start);
+				a3 = getSeq(in.substring(i, inLength), 
+						t.substring(i, inLength), start + i);
 				sumArr = new ArrayList<>();
-				sumArr.addAll(a1);
 				sumArr.addAll(a2);
 				sumArr.addAll(a3);
-				sumArr.add(makeFlipStr(i + start, j + start - 1));
+				sumArr.add(makeFlipStr(start, i + start - 1));
 				if (curMinFlipArr == null)
 					curMinFlipArr = sumArr;
 				else
 					curMinFlipArr = sumArr.size() < curMinFlipArr.size() ? 
 							sumArr : curMinFlipArr;
-			}
-		// recursive case 2, try all possible ways of substitution
-		ArrayList<String> curMinSubArr = null;
-		ArrayList<String> arr5;
-		ArrayList<String> arr6;
-		for (int i = 0; i < inLength; i++) {
-			if (in.charAt(i) != t.charAt(i)) { 
-				arr5 = getSeq(in.substring(0, i), t.substring(0, i), start);
-				arr6 = getSeq(in.substring(i + 1, inLength), 
-						t.substring(i + 1, inLength), start + i + 1);
-				sumArr = new ArrayList<>();
-				sumArr.addAll(arr5);
-				sumArr.addAll(arr6);
-				sumArr.add(makeSubStr(in.charAt(i), i + start, t.charAt(i)));
-				if (curMinSubArr == null)
-					curMinSubArr = sumArr;
-				else
-					curMinSubArr = sumArr.size() < curMinSubArr.size() ? 
-							sumArr : curMinSubArr;
-			}
 		}
+		// recursive case 2, first letter does not belong to flip
+		ArrayList<String> curMinSubArr = null;
+		ArrayList<String> arr6;
+		arr6 = getSeq(in.substring(1, inLength), 
+				t.substring(1, inLength), start + 1);
+		sumArr = new ArrayList<>();
+		if (in.charAt(0) != t.charAt(0)) {
+			sumArr.add(makeSubStr(in.charAt(0), 0 + start, t.charAt(0)));
+		}
+		sumArr.addAll(arr6);
+		curMinSubArr = sumArr;
 		// in case curMinSubArr not initialized for already correct array
 		if (curMinSubArr == null)
 			curMinSubArr = new ArrayList<String>();
@@ -140,10 +132,12 @@ public class TransformationSequence {
 		TransformationSequence t = new TransformationSequence();
 		String source;
 		String target;
-		source = "timeflieslikeanarrow";
-		target = "tfemiliilzejeworrbna";
+		//source = "timeflieslikeanarrow";
+		//target = "tfemiliilzejeworrbna";
+		//source = "ab";
+		//target = "ac";
 		
-		String longSource = RandomStringGenerator.generate(200);
+		String longSource = RandomStringGenerator.generate(450);
 		String longTarget = RandomStringGenerator.mutate(longSource);
 		System.err.println(longTarget);
 		System.err.println(longSource);
@@ -153,6 +147,6 @@ public class TransformationSequence {
 		ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
 		long endTime = System.nanoTime();
 		System.err.println("total time = " + (endTime - startTime) / 1000000000 + " seconds.");
-		t.reverselyPrintArray(result);
+		//t.reverselyPrintArray(result);
 	}
 }
