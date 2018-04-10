@@ -19,8 +19,15 @@ public class TransformationSequence {
 		Triple key = new Triple(start, end, false);
 		
 		// return answer if subproblem already solved
-		if (mem.containsKey(key))
+		if (mem.containsKey(key)) {/*
+			ArrayList<String> answer = mem.get(key);
+			System.err.println("getting from matrix start: " + start + ", end: " + end + ", flipped: " + key.flipped);
+			reverselyPrintArray(answer);
+			System.err.println("----------------------------");
+			System.err.println();
+			*/
 			return mem.get(key);
+		}
 		
 		int inLength = in.length();
 		
@@ -77,6 +84,12 @@ public class TransformationSequence {
 		ArrayList<String> answer = curMinFlipArr.size() < curMinSubArr.size() ?
 				curMinFlipArr : curMinSubArr;
 		mem.put(key, answer);
+		/*
+		System.err.println("Subproblem start: " + start + ", end: " + end + ", flipped: " + key.flipped);
+		reverselyPrintArray(answer);
+		System.err.println("-----------------------");
+		System.err.println();
+		*/
 		return answer;
 	}
 	
@@ -94,36 +107,52 @@ public class TransformationSequence {
 		Triple key = new Triple(start, end, true);
 		
 		// return answer if sub-problem already solved
-		if (mem.containsKey(key))
+		if (mem.containsKey(key)) {
+			ArrayList<String> answer = mem.get(key);
+			/*
+			System.err.println("getting from matrix start: " + start + ", end: " + end + ", flipped: " + key.flipped);
+			reverselyPrintArray(answer);
+			System.err.println("----------------------------");
+			System.err.println();
+			*/
 			return mem.get(key);
+		}
 		
 		ArrayList<String> seq = new ArrayList<String>();
 		int inLength = in.length();
 		int revInd;
 		// check in reverse order due to the flip
 		for (int i = start; i < end; i++) {
-			revInd = inLength - (i - start) - 1;
+			revInd = end - (i - start) - 1;
 			if (in.charAt(i) != t.charAt(revInd))
 				seq.add(makeSubStr(in.charAt(i), revInd, 
 						t.charAt(revInd)));
 		}
 		mem.put(key, seq);
+		/*
+		System.err.println("Subproblem start: " + start + ", end: " + end + ", flipped: " + key.flipped);
+		reverselyPrintArray(seq);
+		System.err.println("-----------------------");
+		System.err.println();
+		*/
 		return seq;
 	}
 	
 	public void reverselyPrintArray(ArrayList<String> arr) {
 		for (int i = arr.size() - 1; i > -1; i--)
-			System.out.println(arr.get(i));
+			System.err.println(arr.get(i));
 	}
 	
 	public static void main(String[] args) {
 		TransformationSequence t = new TransformationSequence();
 		String source;
 		String target;
-		//source = "timeflieslikeanarrow";
-		//target = "tfemiliilzejeworrbna";
-		source = "abcd";
-		target = "bcba";
+		source = "timeflieslikeanarrow";
+		target = "tfemiliilzejeworrbna";
+		//source = "abcd";
+		//target = "bcba";
+		//source = "ab";
+		//target = "bc";
 		
 		String longSource = RandomStringGenerator.generate(500);
 		String longTarget = RandomStringGenerator.mutate(longSource);
@@ -133,7 +162,7 @@ public class TransformationSequence {
 		System.err.println("Finished generating random strings.");
 		long startTime = System.nanoTime();
 		//ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
-		ArrayList<String> result = t.getTranSeqWrapper(source, target);
+		ArrayList<String> result = t.getTranSeqWrapper(longSource, longTarget);
 		long endTime = System.nanoTime();
 		System.err.println("total time = " + (endTime - startTime) / 1000000000 + " seconds.");
 		t.reverselyPrintArray(result);
