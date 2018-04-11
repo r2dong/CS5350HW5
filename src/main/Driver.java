@@ -1,7 +1,5 @@
 package main;
 
-import java.util.ArrayList;
-
 public class Driver {
 	public static void main(String[] args) {
 
@@ -18,10 +16,10 @@ public class Driver {
 			target = RandomStringGenerator.mutate(source);
 		}
 		long startTime = System.nanoTime();
-		ArrayList<String> result = t.getTranSeqWrapper(source, target);
+		Step result = t.getTranSeqWrapper(source, target);
 		long endTime = System.nanoTime();
 		double totalTime = (endTime - startTime) / 1000000000;
-		System.err.println("total time = " + totalTime + " seconds.\n");
-		t.reverselyPrintArray(result);
+		System.out.println("total time = " + totalTime + " seconds.\n");
+		result.print();
 	}
 }

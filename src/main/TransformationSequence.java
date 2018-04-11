@@ -6,14 +6,15 @@ import java.util.HashMap;
 public class TransformationSequence {
 	
 	int inLength; // input size
-	HashMap<Triple, ArrayList<String>> memFlip; // memoization tables
-	HashMap<Duple, ArrayList<String>> memNonFlip;
+	HashMap<Triple, Step> memFlip; // memoization tables
+	HashMap<Duple, Step> memNonFlip;
 	String in;
 	String t;
-	final ArrayList<String> empty = new ArrayList<>();
+	final ArrayList<String> emptyStrings = new ArrayList<>();
+	final ArrayList<Step> emptySteps = new ArrayList<>();
 	
 	// initialize algorithm
-	public ArrayList<String> getTranSeqWrapper(String in, String t) {
+	public Step getTranSeqWrapper(String in, String t) {
 		if (in.length() != t.length()) {
 			System.err.println("source and target length does not match");
 			return null;
@@ -27,7 +28,7 @@ public class TransformationSequence {
 	}
 	
 	// the actual algorithm
-	private ArrayList<String> getSeq(int start) {
+	private Step getSeq(int start) {
 		
 		Duple key = new Duple(start);
 		
@@ -37,56 +38,57 @@ public class TransformationSequence {
 		
 		// base case 1
 		if (start == inLength)
-			return new ArrayList<String>();
+			return new Step(emptyStrings, emptySteps);
 		
 		/* base case 2
-		 * not using memorization matrix here, both constant time, not sure
-		 * which has a larger overhead. In either case should not be a big
-		 * deal
+		 * not using memorization matrix here, both constant time. This way
+		 * uses less memory
 		 */
 		if (start == inLength - 1) {
 			if (in.charAt(start) == t.charAt(start))
-				return empty;
+				return new Step(emptyStrings, emptySteps);
 			else {
 				ArrayList<String> answer = new ArrayList<>();
 				answer.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
-				return answer;
+				return new Step(answer, emptySteps);
 			}
 		}
 		
 		// helper variables to sum results from recursive calls
-		ArrayList<String> sumArr;
-		ArrayList<String> a1;
-		ArrayList<String> a2;
+		ArrayList<Step> sumArr;
+		ArrayList<String> current;
+		Step a1;
+		Step a2;
+		Step curStep;
 		
 		//recursive case 1: try all possible flips including first letter
-		ArrayList<String> curMinFlipArr = null;
+		Step minFlip = null;
 		for (int i = start + 2; i <= inLength; i++) {
 				a1 = getNFSeq(in, t, start, i);
 				a2 = getSeq(i);
 				sumArr = new ArrayList<>();
-				sumArr.addAll(a1);
-				sumArr.addAll(a2);
-				sumArr.add(makeFlipStr(start, i - 1));
-				if (curMinFlipArr == null)
-					curMinFlipArr = sumArr;
-				else if (sumArr.size() < curMinFlipArr.size())
-					curMinFlipArr = sumArr;
+				sumArr.add(a1);
+				sumArr.add(a2);
+				current = new ArrayList<>();
+				current.add(makeFlipStr(start, i - 1));
+				curStep = new Step(current, sumArr);
+				if (minFlip == null)
+					minFlip = curStep;
+				else if (curStep.size < minFlip.size)
+					minFlip = curStep;
 		}
 		
 		// recursive case 2, first letter does not belong to flip
-		ArrayList<String> curMinSubArr = null;
 		a1 = getSeq(start + 1);
+		current = new ArrayList<>();
 		sumArr = new ArrayList<>();
-		if (in.charAt(start) != t.charAt(start)) {
-			sumArr.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
-		}
-		sumArr.addAll(a1);
-		curMinSubArr = sumArr;
+		sumArr.add(a1);
+		if (in.charAt(start) != t.charAt(start))
+			current.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
+		Step minSub = new Step(current, sumArr);
 		
 		// update memorization table, than return
-		ArrayList<String> answer = curMinFlipArr.size() < curMinSubArr.size() ?
-				curMinFlipArr : curMinSubArr;
+		Step answer = minFlip.size < minSub.size ? minFlip : minSub;
 		memNonFlip.put(key, answer);
 		return answer;
 	}
@@ -102,7 +104,7 @@ public class TransformationSequence {
 	}
 	
 	// calculate transformation path when a subarray can no loger be flipped
-	private ArrayList<String> getNFSeq(String in, String t, int start, int end) {
+	private Step getNFSeq(String in, String t, int start, int end) {
 		
 		Triple key = new Triple(start, end);
 		
@@ -110,7 +112,7 @@ public class TransformationSequence {
 		if (memFlip.containsKey(key))
 			return memFlip.get(key);
 		
-		ArrayList<String> seq = new ArrayList<String>();
+		ArrayList<String> seq = new ArrayList<>();
 		int revInd;
 		// check in reverse order due to the flip
 		for (int i = start; i < end; i++) {
@@ -119,8 +121,8 @@ public class TransformationSequence {
 				seq.add(makeSubStr(in.charAt(i), revInd, 
 						t.charAt(revInd)));
 		}
-		memFlip.put(key, seq);
-		return seq;
+		memFlip.put(key, new Step(seq, new ArrayList<>()));
+		return memFlip.get(key);
 	}
 	
 	/* due to recursion, order of elementary moves are in reverse oder, so we
