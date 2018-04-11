@@ -17,20 +17,20 @@ public class TransformationSequence {
 		}
 		inLength = in.length();
 		mem = new HashMap<>();
-		return getSeq(in, t, 0, in.length());
+		return getSeq(in, t, 0);
 	}
 	
 	// the actual algorithm
-	private ArrayList<String> getSeq(String in, String t, int start, int end) {
+	private ArrayList<String> getSeq(String in, String t, int start) {
 		
-		Triple key = new Triple(start, end, false);
+		Triple key = new Triple(start, inLength, false);
 		
 		// return answer if subproblem already solved
 		if (mem.containsKey(key))
 			return mem.get(key);
 		
 		// base case 1
-		if (start == end)
+		if (start == inLength)
 			return new ArrayList<String>();
 		
 		/* base case 2
@@ -38,7 +38,7 @@ public class TransformationSequence {
 		 * which has a larger overhead. In either case should not be a big
 		 * deal
 		 */
-		if (start == end - 1) {
+		if (start == inLength - 1) {
 			if (in.charAt(start) == t.charAt(start))
 				return empty;
 			else {
@@ -57,7 +57,7 @@ public class TransformationSequence {
 		ArrayList<String> curMinFlipArr = null;
 		for (int i = start + 2; i <= inLength; i++) {
 				a1 = getNFSeq(in, t, start, i);
-				a2 = getSeq(in, t, i, inLength);
+				a2 = getSeq(in, t, i);
 				sumArr = new ArrayList<>();
 				sumArr.addAll(a1);
 				sumArr.addAll(a2);
@@ -70,7 +70,7 @@ public class TransformationSequence {
 		
 		// recursive case 2, first letter does not belong to flip
 		ArrayList<String> curMinSubArr = null;
-		a1 = getSeq(in, t, start + 1, inLength);
+		a1 = getSeq(in, t, start + 1);
 		sumArr = new ArrayList<>();
 		if (in.charAt(start) != t.charAt(start)) {
 			sumArr.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
