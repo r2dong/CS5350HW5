@@ -4,12 +4,10 @@ public class Triple {
 	
 	final int left;
 	final int right;
-	final boolean flipped;
 	
-	public Triple(int left, int right, boolean flipped) {
+	public Triple(int left, int right) {
 		this.left = left;
 		this.right = right;
-		this.flipped = flipped;
 	}
 	
 	public boolean equals(Object other) {
@@ -17,7 +15,7 @@ public class Triple {
 			return false;
 		else {
 			Triple p = (Triple)other;
-			return p.left == left && p.right == right && p.flipped == flipped;
+			return p.left == left && p.right == right;
 		}
 	}
 	

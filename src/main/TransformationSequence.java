@@ -6,7 +6,8 @@ import java.util.HashMap;
 public class TransformationSequence {
 	
 	int inLength; // input size
-	HashMap<Triple, ArrayList<String>> mem; // memoization table
+	HashMap<Triple, ArrayList<String>> memFlip; // memoization tables
+	HashMap<Duple, ArrayList<String>> memNonFlip;
 	final ArrayList<String> empty = new ArrayList<>();
 	
 	// initialize algorithm
@@ -16,18 +17,19 @@ public class TransformationSequence {
 			return null;
 		}
 		inLength = in.length();
-		mem = new HashMap<>();
+		memFlip = new HashMap<>();
+		memNonFlip = new HashMap<>();
 		return getSeq(in, t, 0);
 	}
 	
 	// the actual algorithm
 	private ArrayList<String> getSeq(String in, String t, int start) {
 		
-		Triple key = new Triple(start, inLength, false);
+		Duple key = new Duple(start);
 		
 		// return answer if subproblem already solved
-		if (mem.containsKey(key))
-			return mem.get(key);
+		if (memNonFlip.containsKey(key))
+			return memNonFlip.get(key);
 		
 		// base case 1
 		if (start == inLength)
@@ -81,7 +83,7 @@ public class TransformationSequence {
 		// update memorization table, than return
 		ArrayList<String> answer = curMinFlipArr.size() < curMinSubArr.size() ?
 				curMinFlipArr : curMinSubArr;
-		mem.put(key, answer);
+		memNonFlip.put(key, answer);
 		return answer;
 	}
 	
@@ -98,11 +100,11 @@ public class TransformationSequence {
 	// calculate transformation path when a subarray can no loger be flipped
 	private ArrayList<String> getNFSeq(String in, String t, int start, int end) {
 		
-		Triple key = new Triple(start, end, true);
+		Triple key = new Triple(start, end);
 		
 		// return answer if sub-problem already solved
-		if (mem.containsKey(key))
-			return mem.get(key);
+		if (memFlip.containsKey(key))
+			return memFlip.get(key);
 		
 		ArrayList<String> seq = new ArrayList<String>();
 		int revInd;
@@ -113,7 +115,7 @@ public class TransformationSequence {
 				seq.add(makeSubStr(in.charAt(i), revInd, 
 						t.charAt(revInd)));
 		}
-		mem.put(key, seq);
+		memFlip.put(key, seq);
 		return seq;
 	}
 	
