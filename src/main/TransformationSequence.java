@@ -8,6 +8,8 @@ public class TransformationSequence {
 	int inLength; // input size
 	HashMap<Triple, ArrayList<String>> memFlip; // memoization tables
 	HashMap<Duple, ArrayList<String>> memNonFlip;
+	String in;
+	String t;
 	final ArrayList<String> empty = new ArrayList<>();
 	
 	// initialize algorithm
@@ -16,14 +18,16 @@ public class TransformationSequence {
 			System.err.println("source and target length does not match");
 			return null;
 		}
+		this.in = in;
+		this.t = t;
 		inLength = in.length();
 		memFlip = new HashMap<>();
 		memNonFlip = new HashMap<>();
-		return getSeq(in, t, 0);
+		return getSeq(0);
 	}
 	
 	// the actual algorithm
-	private ArrayList<String> getSeq(String in, String t, int start) {
+	private ArrayList<String> getSeq(int start) {
 		
 		Duple key = new Duple(start);
 		
@@ -59,7 +63,7 @@ public class TransformationSequence {
 		ArrayList<String> curMinFlipArr = null;
 		for (int i = start + 2; i <= inLength; i++) {
 				a1 = getNFSeq(in, t, start, i);
-				a2 = getSeq(in, t, i);
+				a2 = getSeq(i);
 				sumArr = new ArrayList<>();
 				sumArr.addAll(a1);
 				sumArr.addAll(a2);
@@ -72,7 +76,7 @@ public class TransformationSequence {
 		
 		// recursive case 2, first letter does not belong to flip
 		ArrayList<String> curMinSubArr = null;
-		a1 = getSeq(in, t, start + 1);
+		a1 = getSeq(start + 1);
 		sumArr = new ArrayList<>();
 		if (in.charAt(start) != t.charAt(start)) {
 			sumArr.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
