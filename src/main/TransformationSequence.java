@@ -10,8 +10,8 @@ public class TransformationSequence {
 	HashMap<Duple, Step> memNonFlip;
 	String in;
 	String t;
-	final ArrayList<String> emptyStrings = new ArrayList<>();
 	final ArrayList<Step> emptySteps = new ArrayList<>();
+	final Step emptyStep = new Step(new ArrayList<>(), emptySteps);
 	
 	// initialize algorithm
 	public Step getTranSeqWrapper(String in, String t) {
@@ -38,7 +38,7 @@ public class TransformationSequence {
 		
 		// base case 1
 		if (start == inLength)
-			return new Step(emptyStrings, emptySteps);
+			return emptyStep;
 		
 		/* base case 2
 		 * not using memorization matrix here, both constant time. This way
@@ -46,7 +46,7 @@ public class TransformationSequence {
 		 */
 		if (start == inLength - 1) {
 			if (in.charAt(start) == t.charAt(start))
-				return new Step(emptyStrings, emptySteps);
+				return emptyStep;
 			else {
 				ArrayList<String> answer = new ArrayList<>();
 				answer.add(makeSubStr(in.charAt(start), start, t.charAt(start)));
@@ -123,13 +123,5 @@ public class TransformationSequence {
 		}
 		memFlip.put(key, new Step(seq, new ArrayList<>()));
 		return memFlip.get(key);
-	}
-	
-	/* due to recursion, order of elementary moves are in reverse oder, so we
-	 * print results in reverse to get the correct order
-	 */
-	public void reverselyPrintArray(ArrayList<String> arr) {
-		for (int i = arr.size() - 1; i > -1; i--)
-			System.err.println(arr.get(i));
 	}
 }

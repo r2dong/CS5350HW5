@@ -1,5 +1,6 @@
 package main;
 
+// a type of key used during memoization
 public class Triple {
 	
 	final int left;
@@ -20,7 +21,6 @@ public class Triple {
 	}
 	
 	public int hashCode() {
-		// divide by 2 in case of overflow
 		return left + right;
 	}
 }

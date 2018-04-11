@@ -1,5 +1,6 @@
 package main;
 
+// a type of key used during memoization
 public class Duple {
 	
 	final int start;
